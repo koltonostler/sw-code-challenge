@@ -1,4 +1,5 @@
 setup:
+	npm install
 	@make build
 	@make up
 
