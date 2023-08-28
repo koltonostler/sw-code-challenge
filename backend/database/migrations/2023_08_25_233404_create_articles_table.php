@@ -14,9 +14,11 @@ return new class extends Migration
         Schema::create('articles', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->string('body');
+            $table->text('body');
             $table->bigInteger('user_id')->unsigned()->index()->nullable();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users');
+            $table->bigInteger('last_edit_user_id')->unsigned()->index()->nullable()->default(null);
+            $table->foreign('last_edit_user_id')->references('id')->on('users');
             $table->timestamps();
         });
     }

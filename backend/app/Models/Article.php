@@ -18,6 +18,7 @@ class Article extends Model
     protected $fillable = [
         'title',
         'body',
-        'user_id'
+        'user_id',
+        'last_edit_user_id'
     ];
 }

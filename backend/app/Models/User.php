@@ -19,6 +19,6 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
-        'isAuthorized'
+        'can_edit'
     ];
 }

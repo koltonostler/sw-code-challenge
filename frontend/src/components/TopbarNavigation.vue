@@ -1,12 +1,11 @@
 <script setup>
 	import {
+		TransitionRoot,
+		TransitionChild,
+		Dialog,
 		Disclosure,
 		DisclosureButton,
 		DisclosurePanel,
-		Menu,
-		MenuButton,
-		MenuItem,
-		MenuItems,
 		ComboboxButton,
 		Combobox,
 		ComboboxInput,
@@ -15,40 +14,50 @@
 	} from '@headlessui/vue';
 	import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid';
 	import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline';
-	import { ref, computed } from 'vue';
+	import { StarIcon } from '@heroicons/vue/24/solid';
+	import { ref, computed, onMounted, watch } from 'vue';
+	import UserForm from './UserForm.vue';
+	import store from '../store';
 
-	const people = [
-		{ id: 1, name: 'Wade Cooper' },
-		{ id: 2, name: 'Arlene Mccoy' },
-		{ id: 3, name: 'Devon Webb' },
-		{ id: 4, name: 'Tom Cook' },
-		{ id: 5, name: 'Tanya Fox' },
-		{ id: 6, name: 'Hellen Schmidt' },
-	];
+	onMounted(() => {
+		store.dispatch('fetchAllUsers');
+	});
 
-	let selected = ref(people[0]);
-	let query = ref('');
-
-	let filteredPeople = computed(() =>
+	let filteredUsers = computed(() =>
 		query.value === ''
-			? people
-			: people.filter((person) =>
-					person.name.toLowerCase().replace(/\s+/g, '').includes(query.value.toLowerCase().replace(/\s+/g, ''))
+			? store.getters.getUsers
+			: store.getters.getUsers.filter((user) =>
+					user.name.toLowerCase().replace(/\s+/g, '').includes(query.value.toLowerCase().replace(/\s+/g, ''))
 			  )
 	);
+	let activeUser = ref(store.getters.getActiveUser);
+	let query = ref('');
+	let selected = ref(filteredUsers[0]);
 
-	const navigation = [];
-	const userNavigation = [
-		{ name: 'Your Profile', href: '#' },
-		{ name: '', href: '#' },
-		{ name: 'Sign out', href: '#' },
-	];
-	const user = {
-		name: 'Tom Cook',
-		email: 'tom@example.com',
-		imageUrl:
-			'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+	watch(filteredUsers, (newFilteredUsers) => {
+		if (newFilteredUsers.length > 0) {
+			selected.value = newFilteredUsers[0];
+		}
+	});
+	watch(selected, (newSelectedUser) => {
+		store.commit('setUser', newSelectedUser);
+	});
+	const updateSelected = ({ activeUser }) => {
+		// Update the selected ref in the parent
+		selected.value = activeUser;
 	};
+	const isOpen = ref(false);
+
+	function closeModal() {
+		isOpen.value = false;
+	}
+	function openModal() {
+		isOpen.value = true;
+	}
+
+	const navigation = [
+		// {name: "Homepage", href: '/'}
+	];
 </script>
 
 <template>
@@ -91,6 +100,11 @@
 							<label
 								class="px-4 text-2xl text-white"
 								for="user"
+								@click="
+									() => {
+										console.log(store.state.activeUser);
+									}
+								"
 								>User</label
 							>
 							<div class="relative">
@@ -100,7 +114,7 @@
 									<ComboboxInput
 										id="user"
 										class="w-full border-none py-2 pl-3 pr-10 text-base font-medium leading-5 text-gray-900 focus:ring-0"
-										:displayValue="(person) => person.name"
+										:displayValue="(user) => user.name"
 										@change="query = $event.target.value"
 									/>
 									<ComboboxButton class="absolute inset-y-0 right-0 flex items-center pr-2">
@@ -120,17 +134,17 @@
 										class="z-10 absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
 									>
 										<div
-											v-if="filteredPeople.length === 0 && query !== ''"
+											v-if="filteredUsers.length === 0 && query !== ''"
 											class="relative cursor-default select-none py-2 px-4 text-gray-700"
 										>
 											Nothing found.
 										</div>
 
 										<ComboboxOption
-											v-for="person in filteredPeople"
+											v-for="user in filteredUsers"
 											as="template"
-											:key="person.id"
-											:value="person"
+											:key="user.id"
+											:value="user"
 											v-slot="{ selected, active }"
 										>
 											<li
@@ -144,7 +158,12 @@
 													class="block truncate"
 													:class="{ 'font-medium': selected, 'font-normal': !selected }"
 												>
-													{{ person.name }}
+													{{ user.name }}
+													<span v-if="user.can_edit"
+														><StarIcon
+															class="inline-block h-3 w-3 text-yellow-400 absolute top-2"
+															aria-hidden="true"
+													/></span>
 												</span>
 												<span
 													v-if="selected"
@@ -202,7 +221,10 @@
 												leave-from="opacity-100 scale-100"
 												leave-to="opacity-0 scale-95"
 											>
-												<ArticleForm :closeModal="closeModal" />
+												<UserForm
+													:closeModal="closeModal"
+													@update:selected="updateSelected"
+												/>
 											</TransitionChild>
 										</div>
 									</div>
@@ -253,7 +275,7 @@
 			</div>
 			<div class="pb-3 px-3">
 				<Combobox v-model="selected">
-					<div class="relative">
+					<div class="relative flex flex-col">
 						<label
 							class="top-1 pl-2 text-lg text-white"
 							for="user"
@@ -265,7 +287,7 @@
 							<ComboboxInput
 								id="user"
 								class="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
-								:displayValue="(person) => person.name"
+								:displayValue="(user) => user.name"
 								@change="query = $event.target.value"
 							/>
 							<ComboboxButton class="absolute inset-y-0 right-0 flex items-center pr-2">
@@ -285,17 +307,17 @@
 								class="absolute max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
 							>
 								<div
-									v-if="filteredPeople.length === 0 && query !== ''"
+									v-if="filteredUsers.length === 0 && query !== ''"
 									class="relative cursor-default select-none py-2 px-4 text-gray-700"
 								>
 									Nothing found.
 								</div>
 
 								<ComboboxOption
-									v-for="person in filteredPeople"
+									v-for="user in filteredUsers"
 									as="template"
-									:key="person.id"
-									:value="person"
+									:key="user.id"
+									:value="user"
 									v-slot="{ selected, active }"
 								>
 									<li
@@ -309,7 +331,12 @@
 											class="block truncate"
 											:class="{ 'font-medium': selected, 'font-normal': !selected }"
 										>
-											{{ person.name }}
+											{{ user.name }}
+											<span v-if="user.can_edit"
+												><StarIcon
+													class="inline-block h-3 w-3 text-yellow-400 absolute top-2"
+													aria-hidden="true"
+											/></span>
 										</span>
 										<span
 											v-if="selected"
@@ -325,6 +352,13 @@
 								</ComboboxOption>
 							</ComboboxOptions>
 						</TransitionRoot>
+						<button
+							type="button"
+							@click="openModal"
+							class="rounded-md justify-self-center mt-3 bg-black bg-opacity-20 px-4 py-2 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
+						>
+							Create User
+						</button>
 					</div>
 				</Combobox>
 			</div>

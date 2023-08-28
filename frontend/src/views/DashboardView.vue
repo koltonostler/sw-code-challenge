@@ -13,6 +13,8 @@
 	function openModal() {
 		isOpen.value = true;
 	}
+    let query = ref('');
+
 </script>
 
 <template>
@@ -29,6 +31,7 @@
                                 title="Search Articles"
 							></MagnifyingGlassIcon>
 							<input
+                                v-model="query"
 								class="px-4 py-2 text-[.8rem] font-medium border-b-2 w-[25vw] sm:w-auto sm:text-sm border-zinc-300 focus-visible:border-[#004E7D]"
                                 placeholder="Search Articles"
 							/>
@@ -75,7 +78,7 @@
 										leave-from="opacity-100 scale-100"
 										leave-to="opacity-0 scale-95"
 									>
-										<ArticleForm :closeModal="closeModal" />
+										<ArticleForm :closeModal="closeModal" articleToEdit="{title: '', body: ''}" :isEdit="false" />
 									</TransitionChild>
 								</div>
 							</div>
@@ -85,8 +88,8 @@
 			</div>
 		</header>
 		<main>
-			<div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
-				<ArticleList />
+			<div class="mx-auto max-w-[100rem] py-6 sm:px-6 lg:px-8">
+				<ArticleList :query="query" />
 			</div>
 		</main>
 	</div>

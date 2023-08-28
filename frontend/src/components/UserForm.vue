@@ -2,35 +2,32 @@
 	import { DialogPanel, DialogTitle } from '@headlessui/vue';
 	import store from '../store';
 	import Alert from './Alert.vue';
-	import { ref, defineProps, computed } from 'vue';
+	import { ref, defineProps, computed, defineEmits } from 'vue';
+	import { Switch } from '@headlessui/vue';
+
+    const emit = defineEmits();
+
+	const enabled = ref(false);
 
 	const props = defineProps({
 		closeModal: Function,
-		articleToEdit: Object,
-		isEdit: Boolean,
 	});
 
-	const article = ref({
-		title: props.articleToEdit.title,
-		body: props.articleToEdit.body,
-        id: props.articleToEdit.id,
-		user: {},
+	const user = ref({
+		name: '',
+		can_edit: '',
 	});
 	let alertType = ref('');
 	let alertMessage = ref('');
 
 	function handleSubmit(e) {
 		e.preventDefault();
-		article.value.user = store.state.activeUser.data;
-
-		let apiCall = 'createArticle';
-		if (props.isEdit) {
-			apiCall = 'updateArticle';
-		}
-
+        
+		user.value.can_edit = enabled.value;
 		store
-			.dispatch(apiCall, article.value)
+			.dispatch('createUser', user.value)
 			.then((res) => {
+                emit('update:selected', {activeUser: res.user})
 				alertType.value = 'success';
 				alertMessage.value = res.message;
 
@@ -48,62 +45,56 @@
 
 <template>
 	<DialogPanel
-		class="w-full lg:max-w-[70%] sm:max-w-[90%] transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all"
+		class="w-full lg:max-w-[30%] sm:max-w-[50%] transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all"
 	>
 		<DialogTitle
-			v-if="props.isEdit"
 			as="h3"
 			class="text-lg font-medium leading-6 text-gray-900"
 		>
-			Edit Article
-		</DialogTitle>
-		<DialogTitle
-			v-else
-			as="h3"
-			class="text-lg font-medium leading-6 text-gray-900"
-		>
-			Create New Article
+			Create New User
 		</DialogTitle>
 		<form @submit="handleSubmit">
 			<div class="space-y-12">
 				<div class="border-b border-gray-900/10 pb-12">
-					<div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+					<div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8">
 						<div class="sm:col-span-4">
 							<label
 								for="title"
 								class="block text-sm font-medium leading-6 text-gray-900"
-								>Title</label
+								>Name</label
 							>
 							<div class="mt-2">
-								<div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 sm:max-w-md">
+								<div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300">
 									<input
-										v-model="article.title"
+										v-model="user.name"
 										type="text"
-										name="title"
-										id="title"
-										autocomplete="title"
+										name="name"
+										id="name"
+										autocomplete="name"
 										class="block flex-1 rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-insert focus:ring-[#3d7ba2] sm:text-sm sm:leading-6"
-										placeholder="New Article Title"
+										placeholder="Name"
 									/>
 								</div>
 							</div>
 						</div>
-
-						<div class="col-span-full">
+						<div class="sm:col-span-4">
 							<label
-								for="body"
+								for="title"
 								class="block text-sm font-medium leading-6 text-gray-900"
-								>Body</label
+								>Can Edit?</label
 							>
-							<div class="mt-2">
-								<textarea
-									v-model="article.body"
-									id="body"
-									name="body"
-									rows="3"
-									class="block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-insert focus:ring-[#3d7ba2] sm:text-sm sm:leading-6"
+
+							<Switch
+								v-model="enabled"
+								:class="enabled ? 'bg-blue-600' : 'bg-gray-200'"
+								class="relative inline-flex h-6 w-11 items-center rounded-full"
+							>
+								<span class="sr-only">Enable notifications</span>
+								<span
+									:class="enabled ? 'translate-x-6' : 'translate-x-1'"
+									class="inline-block h-4 w-4 transform rounded-full bg-white transition"
 								/>
-							</div>
+							</Switch>
 						</div>
 					</div>
 				</div>

@@ -19,7 +19,7 @@ class UserFactory extends Factory
     {
         return [
             'name' => fake()->name(),
-            'isAuthorized' => fake()->boolean(50),
+            'can_edit' => fake()->boolean(50),
         ];
     }
 
