@@ -3,7 +3,7 @@
 ![My Image](studies-weekly-screenshot.jpg)
 ## Overview
 
-Built using PHP Laravel for the backend and Vue 3 on the frontend, this project demonstrates my ability to setup RESTful API endpoints where a user can perorm CRUD operations to interact   with and modify content in a MySQL database. 
+Built using PHP Laravel for the backend and Vue 3 on the frontend, this project demonstrates my ability to setup RESTful API endpoints where a user can perform CRUD operations to interact with and modify content in a MySQL database. 
 
 ## App Functionallity
 Interacting with the application should be pretty straight forward, the only view is a dashboard that displays all articles saved in the database. Here are some of the keypoints of the application:
