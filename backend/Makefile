@@ -1,12 +1,7 @@
 # Setup command will setup entire backend for project
 setup:
-	@make install
 	@make up
 	@make setup_db
-
-# install composer dependencies
-install:
-	composer install
 
 # build and up docker container through Laravel Sail
 up:
