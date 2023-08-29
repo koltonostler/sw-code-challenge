@@ -1,11 +1,50 @@
 # Studies Weekly Coding Challenge - Article CMS
- A simple Content Management System (CMS) for educational articles. Create, read, update and delete articles from a database.
-
+ A simple Content Management System (CMS) for educational articles. Create, read, update and delete articles from a database.<br><br>
+![My Image](studies-weekly-screenshot.jpg)
 ## Overview
 
-Built using PHP Laravel for the backend and Vue 3 on the frontend, this project should demonstrate my ability to setup RESTful API endpoints where a user can perorm CRUD operations to interact   with and modify content in a MySQL database. 
+Built using PHP Laravel for the backend and Vue 3 on the frontend, this project demonstrates my ability to setup RESTful API endpoints where a user can perorm CRUD operations to interact   with and modify content in a MySQL database. 
 
-## Setup
+## App Functionallity
+Interacting with the application should be pretty straight forward, the only view is a dashboard that displays all articles saved in the database. Here are some of the keypoints of the application:
+1. **User Permissions**:
+  Basic user permissions that will either allow or block access to interacting with the API. <br>
+  There are 2 user types:<br>
+  <br>**⭐Admin Users** - have edit access and can create, delete, and update articles.  Admin users have a star by their name in the User dropdown. <br>
+  <br>**Read Only Users** - Any user that doesn't have the star is a Non-Admin user, or Read-Only user. They can see and search all the articles, but will get blocked if they try to interact with the API.<br><br>
+2. **Search by Title** 🔎 : <br>
+The search bar in the dashboard allows you to search by title to find articles easier.
+
+# Setup
+
+## Docker Setup
+Docker setup will require a Unix terminal and having Docker running.  Docker download instructions [here](https://www.docker.com/get-started/)<br><br> 
+Both the frontend and backend have a makefile to run all necessary commands to setup the docker containers and development environment for the application.<br><br>
+Starting at the root of the project, execute the following:
+1. Frontend
+   <br>
+   ```
+   cd frontend
+   make setup
+   ```
+2. Backend
+   <br>
+   ```
+   cd backend
+   make setup
+   ```
+   Doing this will setup everything necessary to run the project, including the MySQL database in a docker container.
+
+### Docker Testing
+To run unit tests for the docker image, execute the following:
+```
+cd backend
+make test
+```
+#### Docker Sidenote
+If you decide to setup with docker, you will not need to add .env files or modify them at all. Even though it is not good practice, for simplicity in sharing and setup for this project, I included the .env files with the needed docker variables in the repository. If the make command does not work, feel free to look at the make files and run each command in sequence in the terminal, this should allow everything to work even if the make command has errors. 
+
+## Local Setup
 The following prerequisites are required for this project:
 * MySQL: >= v8.0.31
 * node: >= v16.17.1
@@ -68,16 +107,6 @@ To run tests:
 ```
 php artisan test
 ```
-
-## App Functionallity
-Interacting with the application should be pretty straight forward, the only view is a dashboard that displays all articles saved in the database. Here are some of the keypoints of the application:
-1. **User Permissions**:
-  Basic user permissions that will either allow or block access to interacting with the API. <br>
-  There are 2 user types:<br>
-  <br>**⭐Admin Users** - have edit access and can create, delete, and update articles.  Admin users have a star by their name in the User dropdown. <br>
-  <br>**Read Only Users** - Any user that doesn't have the star is a Non-Admin user, or Read-Only user. They can see and search all the articles, but will get blocked if they try to interact with the API.<br><br>
-2. **Search by Title** 🔎 : <br>
-The search bar in the dashboard allows you to search by title to find articles easier.
 
 ## API Routes Overview
 
