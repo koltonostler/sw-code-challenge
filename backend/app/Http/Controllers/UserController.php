@@ -41,7 +41,7 @@ class UserController extends Controller
 
         // Validate the request data
         $validatedData = $request->validate([
-            'name' => 'required|string',
+            'name' => 'required|unique:users|string',
             'can_edit' => 'required|boolean',
         ]);
 

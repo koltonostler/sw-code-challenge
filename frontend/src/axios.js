@@ -1,8 +1,11 @@
 import axios from 'axios';
 import store from './store';
 
+// get apiURL from .env file
+const apiURL = import.meta.env.VITE_APP_API_ENDPOINT;
+
 const axiosClient = axios.create({
-	baseURL: 'http://localhost:8000/api',
+	baseURL: apiURL,
 });
 
 axiosClient.interceptors.request.use((config) => {

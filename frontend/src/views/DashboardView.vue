@@ -2,18 +2,20 @@
 	import { ref } from 'vue';
 	import { TransitionRoot, TransitionChild, Dialog } from '@headlessui/vue';
 	import { MagnifyingGlassIcon } from '@heroicons/vue/24/solid';
-	import ArticleForm from '../components/ArticleForm.vue';
+	import ArticleForm from '../components/Forms/ArticleForm.vue';
     import ArticleList from '../components/ArticleList.vue';
 
+    // initialize variables
 	const isOpen = ref(false);
+    let query = ref('');
 
+    // define methods
 	function closeModal() {
 		isOpen.value = false;
 	}
 	function openModal() {
 		isOpen.value = true;
 	}
-    let query = ref('');
 
 </script>
 

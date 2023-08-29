@@ -1,11 +1,11 @@
-<script>
-	export default {
-		name: 'Alert',
-		props: {
-			alertType: String,
-			message: String,
-		},
-	};
+<script setup>
+	import { defineProps } from 'vue';
+    
+    // define props 
+	const props = defineProps({
+		alertType: String,
+		message: String,
+	});
 </script>
 
 <template>

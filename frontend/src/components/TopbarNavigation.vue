@@ -16,24 +16,33 @@
 	import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline';
 	import { StarIcon } from '@heroicons/vue/24/solid';
 	import { ref, computed, onMounted, watch } from 'vue';
-	import UserForm from './UserForm.vue';
+	import UserForm from './Forms/UserForm.vue';
 	import store from '../store';
 
 	onMounted(() => {
 		store.dispatch('fetchAllUsers');
 	});
+    // get computed variables
+    let filteredUsers = computed(() =>
+        query.value === ''
+            ? store.getters.getUsers
+            : store.getters.getUsers.filter((user) =>
+                    user.name.toLowerCase().replace(/\s+/g, '').includes(query.value.toLowerCase().replace(/\s+/g, ''))
+              )
+    );
 
-	let filteredUsers = computed(() =>
-		query.value === ''
-			? store.getters.getUsers
-			: store.getters.getUsers.filter((user) =>
-					user.name.toLowerCase().replace(/\s+/g, '').includes(query.value.toLowerCase().replace(/\s+/g, ''))
-			  )
-	);
+    // initialize variables
+    const navigation = [
+		// {name: "Homepage", href: '/'}
+	];
 	let activeUser = ref(store.getters.getActiveUser);
 	let query = ref('');
 	let selected = ref(filteredUsers[0]);
+    const isOpen = ref(false);
+    
+    
 
+    // variable watches
 	watch(filteredUsers, (newFilteredUsers) => {
 		if (newFilteredUsers.length > 0) {
 			selected.value = newFilteredUsers[0];
@@ -42,12 +51,15 @@
 	watch(selected, (newSelectedUser) => {
 		store.commit('setUser', newSelectedUser);
 	});
-	const updateSelected = ({ activeUser }) => {
-		// Update the selected ref in the parent
-		selected.value = activeUser;
-	};
-	const isOpen = ref(false);
 
+
+    //define methods
+
+    // pass this function to the userForm to change selected to the newest user
+    const updateSelected = ({ activeUser }) => {
+        
+        selected.value = activeUser;
+    };
 	function closeModal() {
 		isOpen.value = false;
 	}
@@ -55,9 +67,7 @@
 		isOpen.value = true;
 	}
 
-	const navigation = [
-		// {name: "Homepage", href: '/'}
-	];
+	
 </script>
 
 <template>
@@ -100,11 +110,6 @@
 							<label
 								class="px-4 text-2xl text-white"
 								for="user"
-								@click="
-									() => {
-										console.log(store.state.activeUser);
-									}
-								"
 								>User</label
 							>
 							<div class="relative">
