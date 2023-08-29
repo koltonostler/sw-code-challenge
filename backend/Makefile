@@ -1,5 +1,6 @@
-# Setup command will setup entire backend for project
+# Setup command will setup entire backend for project, composer install is needed to setup Laravel sail
 setup:
+	composer install 
 	@make up
 	@make setup_db
 
